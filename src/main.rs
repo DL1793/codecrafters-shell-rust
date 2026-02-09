@@ -13,6 +13,13 @@ fn main() {
         process::exit(0)
        }
 
+        if command.starts_with("echo") {    
+            if let Some(args) = command.trim().strip_prefix("echo ") {
+                println!("{}", args);
+       }
+       }
+       else {
         println!("{}: command not found", command.trim())
+       }
     }
 }
