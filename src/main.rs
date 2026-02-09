@@ -1,13 +1,16 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::process;
+use std::env::set_current_dir;
 mod find_exec;
+
 
 enum BuiltIns {
     Type,
     Echo,
     Exit,
-    Pwd
+    Pwd,
+    Cd
 }
 
 impl BuiltIns {
@@ -17,6 +20,7 @@ impl BuiltIns {
             "exit" => Some(BuiltIns::Exit),
             "type" => Some(BuiltIns::Type),
             "pwd" => Some(BuiltIns::Pwd),
+            "cd" => Some(BuiltIns::Cd),
             _ => None,
         }
     }
@@ -39,6 +43,20 @@ fn main() {
         match BuiltIns::from_command(cmd_str) {
             Some(BuiltIns::Exit) => process::exit(0),
             Some(BuiltIns::Echo) => println!("{}", args),
+            Some(BuiltIns::Cd) => {
+                let new_dir = args.trim();
+
+                let path = if new_dir == "~" {
+                    std::env::var("HOME").unwrap_or_else(|_| "/".to_string())
+                }
+                else {
+                    new_dir.to_string()
+                };
+
+                if let Err(e) = std::env::set_current_dir(&path) {
+                    eprintln!("cd: {}: {}", path, e);
+                }
+            }
             Some(BuiltIns::Pwd) => {
                 match std::env::current_dir() {
                     Ok(path) => {
@@ -58,13 +76,12 @@ fn main() {
                         match find_exec::find_executable(args) {
                             Some(path) => println!("{} is {}", args, path),
                             None => println!("{}: not found", args),
-                        }
-                        
+                        }    
                     }
                 }
             }
             None => {
-                if let Some(path) = find_exec::find_executable(cmd_str) {
+                if let Some(cmd_str) = find_exec::find_executable(cmd_str) {
                     let mut child = process::Command::new(cmd_str)
                         .args(args.split_whitespace())
                         .spawn();
