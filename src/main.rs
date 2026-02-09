@@ -1,31 +1,16 @@
 #[allow(unused_imports)]
+mod locator;
+mod builtins;
+
 use std::io::{self, Write};
 use std::process;
 use std::env::set_current_dir;
 use std::os::unix::process::CommandExt;
-mod find_exec;
+use crate::builtins::BuiltIns;
 
 
-enum BuiltIns {
-    Type,
-    Echo,
-    Exit,
-    Pwd,
-    Cd
-}
 
-impl BuiltIns {
-    fn from_command(cmd: &str) -> Option<BuiltIns> {
-        match cmd {
-            "echo" => Some(BuiltIns::Echo),
-            "exit" => Some(BuiltIns::Exit),
-            "type" => Some(BuiltIns::Type),
-            "pwd" => Some(BuiltIns::Pwd),
-            "cd" => Some(BuiltIns::Cd),
-            _ => None,
-        }
-    }
-}
+
 
 fn main() {
     loop {
@@ -74,7 +59,7 @@ fn main() {
                         println!("{} is a shell builtin", args);
                     }
                     None => {
-                        match find_exec::find_executable(args) {
+                        match locator::find_executable(args) {
                             Some(path) => println!("{} is {}", args, path),
                             None => println!("{}: not found", args),
                         }    
@@ -82,7 +67,7 @@ fn main() {
                 }
             }
             None => {
-                if let Some(path) = find_exec::find_executable(cmd_str) {
+                if let Some(path) = locator::find_executable(cmd_str) {
 
                     let mut child = process::Command::new(path)
                         .arg0(cmd_str)
