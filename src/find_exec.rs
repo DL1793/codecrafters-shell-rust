@@ -1,4 +1,5 @@
 use std::{env, fs};
+use std::os::unix::fs::PermissionsExt;
 
 pub fn find_executable(cmd: &str) -> Option<String> {
     let path_var = env::var("PATH").ok()?;
