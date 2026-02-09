@@ -1,13 +1,13 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::process;
-use std::process::Command;
 mod find_exec;
 
 enum BuiltIns {
     Type,
     Echo,
-    Exit
+    Exit,
+    Pwd
 }
 
 impl BuiltIns {
@@ -16,6 +16,7 @@ impl BuiltIns {
             "echo" => Some(BuiltIns::Echo),
             "exit" => Some(BuiltIns::Exit),
             "type" => Some(BuiltIns::Type),
+            "pwd" => Some(BuiltIns::Pwd),
             _ => None,
         }
     }
@@ -38,6 +39,16 @@ fn main() {
         match BuiltIns::from_command(cmd_str) {
             Some(BuiltIns::Exit) => process::exit(0),
             Some(BuiltIns::Echo) => println!("{}", args),
+            Some(BuiltIns::Pwd) => {
+                match std::env::current_dir() {
+                    Ok(path) => {
+                        println!("{}", path.display());
+                    }
+                    Err(e) => {
+                        eprintln!("Error retrieving current directory: {}", e);
+                    }
+                }
+            }
             Some(BuiltIns::Type) => {
                 match BuiltIns::from_command(args) {
                     Some(_) => {
