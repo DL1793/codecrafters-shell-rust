@@ -47,7 +47,7 @@ fn main() {
                 }
             }
             None => {
-                println!("{} not found", cmd_str)
+                println!("{}: not found", cmd_str)
             }
         }
 
