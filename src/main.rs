@@ -54,7 +54,7 @@ fn main() {
                 };
 
                 if let Err(e) = std::env::set_current_dir(&path) {
-                    eprintln!("cd: {}: {}", path, e);
+                    eprintln!("cd: {}: No such file or directory", path);
                 }
             }
             Some(BuiltIns::Pwd) => {
