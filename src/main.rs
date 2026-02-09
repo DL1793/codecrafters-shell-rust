@@ -1,6 +1,7 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::process;
+use std::process::Command;
 mod find_exec;
 
 enum BuiltIns {
@@ -52,7 +53,21 @@ fn main() {
                 }
             }
             None => {
-                println!("{}: not found", cmd_str)
+                if let Some(path) = find_exec::find_executable(cmd_str) {
+                    let mut child = process::Command::new(path)
+                        .args(args.split_whitespace())
+                        .spawn();
+
+                    match child {
+                        Ok(mut child) => {
+                            let _ = child.wait();
+                        },
+                        Err(e) => eprintln!("Failed to start command: {}", e),
+                    }
+                }
+                else {
+                    println!("{}: not found", cmd_str)
+                }
             }
         }
 
