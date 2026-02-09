@@ -54,7 +54,7 @@ fn main() {
             }
             None => {
                 if let Some(path) = find_exec::find_executable(cmd_str) {
-                    let mut child = process::Command::new(path)
+                    let mut child = process::Command::new(cmd_str)
                         .args(args.split_whitespace())
                         .spawn();
 
