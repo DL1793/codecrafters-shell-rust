@@ -1,6 +1,7 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::process;
+mod find_exec;
 
 enum BuiltIns {
     Type,
@@ -42,7 +43,11 @@ fn main() {
                         println!("{} is a shell builtin", args);
                     }
                     None => {
-                        println!("{}: not found", args)
+                        match find_exec::find_executable(args) {
+                            Some(path) => println!("{} is {}", args, path),
+                            None => println!("{}: not found", args),
+                        }
+                        
                     }
                 }
             }
