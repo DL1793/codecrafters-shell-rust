@@ -2,6 +2,7 @@
 use std::io::{self, Write};
 use std::process;
 use std::env::set_current_dir;
+use std::os::unix::process::CommandExt;
 mod find_exec;
 
 
@@ -81,8 +82,10 @@ fn main() {
                 }
             }
             None => {
-                if let Some(cmd_str) = find_exec::find_executable(cmd_str) {
-                    let mut child = process::Command::new(cmd_str)
+                if let Some(path) = find_exec::find_executable(cmd_str) {
+
+                    let mut child = process::Command::new(path)
+                        .arg0(cmd_str)
                         .args(args.split_whitespace())
                         .spawn();
 
